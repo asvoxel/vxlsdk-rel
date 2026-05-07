@@ -1,6 +1,6 @@
 /**
- * @file vxl615_ae_adjustment.c
- * @brief VXL615 AE (自动曝光) 参数动态调整示例
+ * @file vxl6x5_ae_adjustment.c
+ * @brief VXL6X5 AE (自动曝光) 参数动态调整示例
  *
  * 演示如何调节AE参数以优化图像曝光：
  * 1. Fmean目标调节 (目标亮度控制)
@@ -9,8 +9,8 @@
  * 4. 监控当前AE状态
  * 5. 2D (NIR) 和 3D (Depth) AE独立控制
  *
- * 编译: make vxl615_ae_adjustment
- * 运行: ./bin/vxl615_ae_adjustment
+ * 编译: make vxl6x5_ae_adjustment
+ * 运行: ./bin/vxl6x5_ae_adjustment
  */
 
 #include <stdio.h>
@@ -20,7 +20,7 @@
 #include "vxl_device.h"
 #include "vxl_sensor.h"
 #include "vxl_types.h"
-#include "vxl615_types.h"
+#include "vxl6x5_types.h"
 
 /* AE参数配置 */
 typedef struct {
@@ -80,7 +80,7 @@ static const ae_config_t AE_DARK = {
  * 辅助函数
  *============================================================================*/
 
-static vxl_sensor_t* open_vxl615_sensor(vxl_context_t **out_ctx, vxl_device_t **out_device)
+static vxl_sensor_t* open_vxl6x5_sensor(vxl_context_t **out_ctx, vxl_device_t **out_device)
 {
     vxl_context_t *ctx = NULL;
     vxl_device_t *device = NULL;
@@ -103,8 +103,7 @@ static vxl_sensor_t* open_vxl615_sensor(vxl_context_t **out_ctx, vxl_device_t **
         vxl_device_info_t info;
         err = vxl_device_get_info(device, &info);
         if (err == VXL_SUCCESS &&
-            info.vendor_id == VXL615_VENDOR_ID &&
-            info.product_id == VXL615_PRODUCT_ID) {
+            VXL6X5_VID_PID_MATCH(info.vendor_id, info.product_id)) {
 
             err = vxl_device_open(device);
             if (err != VXL_SUCCESS) continue;
@@ -114,7 +113,7 @@ static vxl_sensor_t* open_vxl615_sensor(vxl_context_t **out_ctx, vxl_device_t **
             if (err == VXL_SUCCESS) {
                 *out_ctx = ctx;
                 *out_device = device;
-                printf("Opened VXL615: %s\n", info.name);
+                printf("Opened VXL6X5: %s\n", info.name);
                 return sensor;
             }
 
@@ -137,13 +136,13 @@ vxl_error_t apply_2d_ae_config(vxl_sensor_t *sensor, const ae_config_t *config)
     printf("Applying 2D AE configuration...\n");
 
     /* Fmean Target */
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_2D_FMEAN_TARGET, config->fmean_target);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_FMEAN_TARGET, config->fmean_target);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set Fmean target\n");
         return err;
     }
 
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_2D_FMEAN_BOUNDARY, config->fmean_boundary);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_FMEAN_BOUNDARY, config->fmean_boundary);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set Fmean boundary\n");
         return err;
@@ -151,13 +150,13 @@ vxl_error_t apply_2d_ae_config(vxl_sensor_t *sensor, const ae_config_t *config)
     printf("  Fmean: target=%.0f, boundary=%.0f\n", config->fmean_target, config->fmean_boundary);
 
     /* Gain Range */
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_2D_GAIN_MIN, config->gain_min);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_GAIN_MIN, config->gain_min);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set Gain min\n");
         return err;
     }
 
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_2D_GAIN_MAX, config->gain_max);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_GAIN_MAX, config->gain_max);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set Gain max\n");
         return err;
@@ -165,19 +164,19 @@ vxl_error_t apply_2d_ae_config(vxl_sensor_t *sensor, const ae_config_t *config)
     printf("  Gain range: [%.0f - %.0f]\n", config->gain_min, config->gain_max);
 
     /* Exposure Range */
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_2D_EXPOSURE_MIN, config->exposure_min);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MIN, config->exposure_min);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set Exposure min\n");
         return err;
     }
 
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_2D_EXPOSURE_MID, config->exposure_mid);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MID, config->exposure_mid);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set Exposure mid\n");
         return err;
     }
 
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_2D_EXPOSURE_MAX, config->exposure_max);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MAX, config->exposure_max);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set Exposure max\n");
         return err;
@@ -193,13 +192,13 @@ vxl_error_t get_2d_ae_status(vxl_sensor_t *sensor, ae_status_t *status)
 {
     vxl_error_t err;
 
-    err = vxl_sensor_get_option(sensor, VXL615_OPTION_2D_FMEAN_CURRENT, &status->fmean_current);
+    err = vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_FMEAN_CURRENT, &status->fmean_current);
     if (err != VXL_SUCCESS) return err;
 
-    err = vxl_sensor_get_option(sensor, VXL615_OPTION_2D_GAIN_CURRENT, &status->gain_current);
+    err = vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_GAIN_CURRENT, &status->gain_current);
     if (err != VXL_SUCCESS) return err;
 
-    err = vxl_sensor_get_option(sensor, VXL615_OPTION_2D_EXPOSURE_CURRENT, &status->exposure_current);
+    err = vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_CURRENT, &status->exposure_current);
     if (err != VXL_SUCCESS) return err;
 
     return VXL_SUCCESS;
@@ -249,19 +248,19 @@ void example_fmean_tuning(vxl_sensor_t *sensor)
 
     /* 暗图像 */
     printf("\n1. Dark image (Fmean target = 5000):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_FMEAN_TARGET, 5000.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_FMEAN_TARGET, 5000.0f);
     sleep(1);
     print_2d_ae_status(sensor);
 
     /* 中等亮度 */
     printf("\n2. Medium brightness (Fmean target = 10000):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_FMEAN_TARGET, 10000.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_FMEAN_TARGET, 10000.0f);
     sleep(1);
     print_2d_ae_status(sensor);
 
     /* 亮图像 */
     printf("\n3. Bright image (Fmean target = 15000):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_FMEAN_TARGET, 15000.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_FMEAN_TARGET, 15000.0f);
     sleep(1);
     print_2d_ae_status(sensor);
 }
@@ -276,20 +275,20 @@ void example_gain_control(vxl_sensor_t *sensor)
 
     /* 低增益 (适合明亮环境) */
     printf("\n1. Low gain (for bright environment, max=500):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_GAIN_MIN, 100.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_GAIN_MAX, 500.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_GAIN_MIN, 100.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_GAIN_MAX, 500.0f);
     sleep(1);
     print_2d_ae_status(sensor);
 
     /* 中等增益 */
     printf("\n2. Medium gain (normal conditions, max=1200):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_GAIN_MAX, 1200.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_GAIN_MAX, 1200.0f);
     sleep(1);
     print_2d_ae_status(sensor);
 
     /* 高增益 (适合暗环境) */
     printf("\n3. High gain (for dark environment, max=2500):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_GAIN_MAX, 2500.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_GAIN_MAX, 2500.0f);
     sleep(1);
     print_2d_ae_status(sensor);
 }
@@ -304,23 +303,23 @@ void example_exposure_control(vxl_sensor_t *sensor)
 
     /* 短曝光 (适合快速运动) */
     printf("\n1. Short exposure (for fast motion, max=2000):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_EXPOSURE_MIN, 100.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_EXPOSURE_MID, 500.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_EXPOSURE_MAX, 2000.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MIN, 100.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MID, 500.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MAX, 2000.0f);
     sleep(1);
     print_2d_ae_status(sensor);
 
     /* 中等曝光 */
     printf("\n2. Medium exposure (normal, max=10000):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_EXPOSURE_MID, 2000.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_EXPOSURE_MAX, 10000.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MID, 2000.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MAX, 10000.0f);
     sleep(1);
     print_2d_ae_status(sensor);
 
     /* 长曝光 (适合静态场景) */
     printf("\n3. Long exposure (for static scenes, max=30000):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_EXPOSURE_MID, 10000.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_2D_EXPOSURE_MAX, 30000.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MID, 10000.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MAX, 30000.0f);
     sleep(1);
     print_2d_ae_status(sensor);
 }
@@ -347,17 +346,17 @@ void example_monitor_ae(vxl_sensor_t *sensor)
 
 int main(int argc, char **argv)
 {
-    printf("VXL615 AE Adjustment Example\n");
+    printf("VXL6X5 AE Adjustment Example\n");
     printf("=============================\n\n");
 
-    /* 打开VXL615设备 */
+    /* 打开VXL6X5设备 */
     vxl_context_t *ctx = NULL;
     vxl_device_t *device = NULL;
-    vxl_sensor_t *sensor = open_vxl615_sensor(&ctx, &device);
+    vxl_sensor_t *sensor = open_vxl6x5_sensor(&ctx, &device);
 
     if (!sensor) {
-        fprintf(stderr, "Failed to open VXL615 sensor\n");
-        fprintf(stderr, "Note: This example requires a VXL615 device\n");
+        fprintf(stderr, "Failed to open VXL6X5 sensor\n");
+        fprintf(stderr, "Note: This example requires a VXL6X5 device\n");
         return EXIT_FAILURE;
     }
 
@@ -392,7 +391,7 @@ int main(int argc, char **argv)
     printf("  5. Monitor current AE status to verify convergence\n");
 
     printf("\nNote: This example demonstrated 2D AE control.\n");
-    printf("      Use VXL615_OPTION_3D_* options for 3D (Depth) AE control.\n");
+    printf("      Use VXL6X5_OPTION_3D_* options for 3D (Depth) AE control.\n");
 
     /* 清理 */
     vxl_sensor_release(sensor);

@@ -1,6 +1,6 @@
 /**
- * @file vxl615_option_control.c
- * @brief VXL615 Option控制基础示例
+ * @file vxl6x5_option_control.c
+ * @brief VXL6X5 Option控制基础示例
  *
  * 演示如何：
  * 1. 检查Option支持
@@ -8,8 +8,8 @@
  * 3. 读取和设置Option值
  * 4. 处理只读Option
  *
- * 编译: make vxl615_option_control
- * 运行: ./bin/vxl615_option_control
+ * 编译: make vxl6x5_option_control
+ * 运行: ./bin/vxl6x5_option_control
  */
 
 #include <stdio.h>
@@ -19,16 +19,16 @@
 #include "vxl_device.h"
 #include "vxl_sensor.h"
 #include "vxl_types.h"
-#include "vxl615_types.h"
+#include "vxl6x5_types.h"
 
 /*============================================================================
  * 辅助函数
  *============================================================================*/
 
 /**
- * @brief 查找并打开第一个VXL615设备
+ * @brief 查找并打开第一个VXL6X5设备
  */
-static vxl_sensor_t* open_vxl615_sensor(vxl_context_t **out_ctx, vxl_device_t **out_device)
+static vxl_sensor_t* open_vxl6x5_sensor(vxl_context_t **out_ctx, vxl_device_t **out_device)
 {
     vxl_context_t *ctx = NULL;
     vxl_device_t *device = NULL;
@@ -52,7 +52,7 @@ static vxl_sensor_t* open_vxl615_sensor(vxl_context_t **out_ctx, vxl_device_t **
 
     printf("Found %zu device(s)\n", count);
 
-    /* 查找VXL615 */
+    /* 查找VXL6X5 */
     for (size_t i = 0; i < count; i++) {
         err = vxl_context_get_device(ctx, i, &device);
         if (err != VXL_SUCCESS) continue;
@@ -64,10 +64,9 @@ static vxl_sensor_t* open_vxl615_sensor(vxl_context_t **out_ctx, vxl_device_t **
         printf("Device %zu: %s (VID:PID = %04X:%04X)\n",
                i, info.name, info.vendor_id, info.product_id);
 
-        /* 检查是否是VXL615 */
-        if (info.vendor_id == VXL615_VENDOR_ID &&
-            info.product_id == VXL615_PRODUCT_ID) {
-            printf("Found VXL615: %s\n", info.name);
+        /* 检查是否是VXL6X5系列 (605/615) */
+        if (VXL6X5_VID_PID_MATCH(info.vendor_id, info.product_id)) {
+            printf("Found VXL6X5: %s\n", info.name);
 
             /* 打开设备 */
             err = vxl_device_open(device);
@@ -90,7 +89,7 @@ static vxl_sensor_t* open_vxl615_sensor(vxl_context_t **out_ctx, vxl_device_t **
         }
     }
 
-    fprintf(stderr, "No VXL615 device found\n");
+    fprintf(stderr, "No VXL6X5 device found\n");
     vxl_context_destroy(ctx);
     return NULL;
 }
@@ -108,10 +107,10 @@ void example_check_option_support(vxl_sensor_t *sensor)
         const char *name;
     } options[] = {
         { VXL_OPTION_IR_ENABLE, "IR_ENABLE" },
-        { VXL615_OPTION_NCC_THRESHOLD, "NCC_THRESHOLD" },
-        { VXL615_OPTION_DENOISE_ENABLE, "DENOISE_ENABLE" },
-        { VXL615_OPTION_2D_FMEAN_TARGET, "2D_FMEAN_TARGET" },
-        { VXL615_OPTION_3D_GAIN_MIN, "3D_GAIN_MIN" },
+        { VXL6X5_OPTION_NCC_THRESHOLD, "NCC_THRESHOLD" },
+        { VXL6X5_OPTION_DENOISE_ENABLE, "DENOISE_ENABLE" },
+        { VXL6X5_OPTION_2D_FMEAN_TARGET, "2D_FMEAN_TARGET" },
+        { VXL6X5_OPTION_3D_GAIN_MIN, "3D_GAIN_MIN" },
     };
 
     for (size_t i = 0; i < sizeof(options) / sizeof(options[0]); i++) {
@@ -138,10 +137,10 @@ void example_get_option_range(vxl_sensor_t *sensor)
         vxl_option_t option;
         const char *name;
     } options[] = {
-        { VXL615_OPTION_NCC_THRESHOLD, "NCC_THRESHOLD" },
-        { VXL615_OPTION_PATCH_SIZE, "PATCH_SIZE" },
-        { VXL615_OPTION_DENOISE_LEVEL, "DENOISE_LEVEL" },
-        { VXL615_OPTION_MEDIAN_KERNEL_SIZE, "MEDIAN_KERNEL_SIZE" },
+        { VXL6X5_OPTION_NCC_THRESHOLD, "NCC_THRESHOLD" },
+        { VXL6X5_OPTION_PATCH_SIZE, "PATCH_SIZE" },
+        { VXL6X5_OPTION_DENOISE_LEVEL, "DENOISE_LEVEL" },
+        { VXL6X5_OPTION_MEDIAN_KERNEL_SIZE, "MEDIAN_KERNEL_SIZE" },
     };
 
     for (size_t i = 0; i < sizeof(options) / sizeof(options[0]); i++) {
@@ -168,41 +167,41 @@ void example_get_set_option(vxl_sensor_t *sensor)
     /* 1. NCC Threshold */
     printf("\nNCC Threshold:\n");
     float value = 0.0f;
-    vxl_error_t err = vxl_sensor_get_option(sensor, VXL615_OPTION_NCC_THRESHOLD, &value);
+    vxl_error_t err = vxl_sensor_get_option(sensor, VXL6X5_OPTION_NCC_THRESHOLD, &value);
     if (err == VXL_SUCCESS) {
         printf("  Current value: %.0f\n", value);
 
         /* 设置新值 */
         float new_value = 150.0f;
-        err = vxl_sensor_set_option(sensor, VXL615_OPTION_NCC_THRESHOLD, new_value);
+        err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_NCC_THRESHOLD, new_value);
         if (err == VXL_SUCCESS) {
             printf("  Set to: %.0f\n", new_value);
 
             /* 读取验证 */
-            err = vxl_sensor_get_option(sensor, VXL615_OPTION_NCC_THRESHOLD, &value);
+            err = vxl_sensor_get_option(sensor, VXL6X5_OPTION_NCC_THRESHOLD, &value);
             if (err == VXL_SUCCESS) {
                 printf("  Read back: %.0f\n", value);
             }
 
             /* 恢复原值 (演示完成后恢复) */
-            // vxl_sensor_set_option(sensor, VXL615_OPTION_NCC_THRESHOLD, original_value);
+            // vxl_sensor_set_option(sensor, VXL6X5_OPTION_NCC_THRESHOLD, original_value);
         }
     }
 
     /* 2. Boolean Option - Denoise Enable */
     printf("\nDenoise Enable (Boolean):\n");
-    err = vxl_sensor_get_option(sensor, VXL615_OPTION_DENOISE_ENABLE, &value);
+    err = vxl_sensor_get_option(sensor, VXL6X5_OPTION_DENOISE_ENABLE, &value);
     if (err == VXL_SUCCESS) {
         printf("  Current value: %s\n", value > 0.5f ? "ON" : "OFF");
 
         /* 切换状态 */
         float new_state = (value > 0.5f) ? 0.0f : 1.0f;
-        err = vxl_sensor_set_option(sensor, VXL615_OPTION_DENOISE_ENABLE, new_state);
+        err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_DENOISE_ENABLE, new_state);
         if (err == VXL_SUCCESS) {
             printf("  Set to: %s\n", new_state > 0.5f ? "ON" : "OFF");
 
             /* 读取验证 */
-            err = vxl_sensor_get_option(sensor, VXL615_OPTION_DENOISE_ENABLE, &value);
+            err = vxl_sensor_get_option(sensor, VXL6X5_OPTION_DENOISE_ENABLE, &value);
             if (err == VXL_SUCCESS) {
                 printf("  Read back: %s\n", value > 0.5f ? "ON" : "OFF");
             }
@@ -223,9 +222,9 @@ void example_readonly_option(vxl_sensor_t *sensor)
         vxl_option_t option;
         const char *name;
     } readonly_options[] = {
-        { VXL615_OPTION_2D_FMEAN_CURRENT, "2D_FMEAN_CURRENT" },
-        { VXL615_OPTION_2D_GAIN_CURRENT, "2D_GAIN_CURRENT" },
-        { VXL615_OPTION_2D_EXPOSURE_CURRENT, "2D_EXPOSURE_CURRENT" },
+        { VXL6X5_OPTION_2D_FMEAN_CURRENT, "2D_FMEAN_CURRENT" },
+        { VXL6X5_OPTION_2D_GAIN_CURRENT, "2D_GAIN_CURRENT" },
+        { VXL6X5_OPTION_2D_EXPOSURE_CURRENT, "2D_EXPOSURE_CURRENT" },
     };
 
     printf("\nReading current AE status (read-only):\n");
@@ -239,7 +238,7 @@ void example_readonly_option(vxl_sensor_t *sensor)
 
     /* 尝试设置只读Option (应该失败) */
     printf("\nTrying to set read-only option (should fail):\n");
-    vxl_error_t err = vxl_sensor_set_option(sensor, VXL615_OPTION_2D_GAIN_CURRENT, 100.0f);
+    vxl_error_t err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_2D_GAIN_CURRENT, 100.0f);
     if (err != VXL_SUCCESS) {
         printf("  Set 2D_GAIN_CURRENT: Failed as expected (error %d)\n", err);
         printf("  This is correct behavior - read-only options cannot be set\n");
@@ -263,24 +262,24 @@ void example_batch_read_params(vxl_sensor_t *sensor)
     float gain_min, gain_max, gain_current;
     float exp_min, exp_mid, exp_max, exp_current;
 
-    vxl_sensor_get_option(sensor, VXL615_OPTION_2D_FMEAN_TARGET, &fmean_target);
-    vxl_sensor_get_option(sensor, VXL615_OPTION_2D_FMEAN_BOUNDARY, &fmean_boundary);
-    vxl_sensor_get_option(sensor, VXL615_OPTION_2D_FMEAN_CURRENT, &fmean_current);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_FMEAN_TARGET, &fmean_target);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_FMEAN_BOUNDARY, &fmean_boundary);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_FMEAN_CURRENT, &fmean_current);
 
     printf("  Fmean: target=%.0f, boundary=%.0f, current=%.0f\n",
            fmean_target, fmean_boundary, fmean_current);
 
-    vxl_sensor_get_option(sensor, VXL615_OPTION_2D_GAIN_MIN, &gain_min);
-    vxl_sensor_get_option(sensor, VXL615_OPTION_2D_GAIN_MAX, &gain_max);
-    vxl_sensor_get_option(sensor, VXL615_OPTION_2D_GAIN_CURRENT, &gain_current);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_GAIN_MIN, &gain_min);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_GAIN_MAX, &gain_max);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_GAIN_CURRENT, &gain_current);
 
     printf("  Gain: min=%.0f, max=%.0f, current=%.0f\n",
            gain_min, gain_max, gain_current);
 
-    vxl_sensor_get_option(sensor, VXL615_OPTION_2D_EXPOSURE_MIN, &exp_min);
-    vxl_sensor_get_option(sensor, VXL615_OPTION_2D_EXPOSURE_MID, &exp_mid);
-    vxl_sensor_get_option(sensor, VXL615_OPTION_2D_EXPOSURE_MAX, &exp_max);
-    vxl_sensor_get_option(sensor, VXL615_OPTION_2D_EXPOSURE_CURRENT, &exp_current);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MIN, &exp_min);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MID, &exp_mid);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_MAX, &exp_max);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_2D_EXPOSURE_CURRENT, &exp_current);
 
     printf("  Exposure: min=%.0f, mid=%.0f, max=%.0f, current=%.0f\n",
            exp_min, exp_mid, exp_max, exp_current);
@@ -292,16 +291,16 @@ void example_batch_read_params(vxl_sensor_t *sensor)
 
 int main(int argc, char **argv)
 {
-    printf("VXL615 Option Control Example\n");
+    printf("VXL6X5 Option Control Example\n");
     printf("==============================\n");
 
-    /* 打开VXL615设备 */
+    /* 打开VXL6X5设备 */
     vxl_context_t *ctx = NULL;
     vxl_device_t *device = NULL;
-    vxl_sensor_t *sensor = open_vxl615_sensor(&ctx, &device);
+    vxl_sensor_t *sensor = open_vxl6x5_sensor(&ctx, &device);
 
     if (!sensor) {
-        fprintf(stderr, "Failed to open VXL615 sensor\n");
+        fprintf(stderr, "Failed to open VXL6X5 sensor\n");
         return EXIT_FAILURE;
     }
 

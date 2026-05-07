@@ -149,46 +149,46 @@ typedef enum vxl_option {
     VXL435_OPTION_TWEAK_MODE            = 1030, /* 调试模式开关 */
 
     /*========================================================================
-     * VXL615 产品特定选项 (2000-2099)
+     * VXL6X5 产品特定选项 (2000-2099)
      *========================================================================*/
 
     /* IR 高级控制 (2000-2009) */
-    VXL615_OPTION_IR_PERIOD             = 2001, /* IR 投影周期 */
-    VXL615_OPTION_IR_DUTY_CYCLE         = 2002, /* IR 占空比 */
+    VXL6X5_OPTION_IR_PERIOD             = 2001, /* IR 投影周期 */
+    VXL6X5_OPTION_IR_DUTY_CYCLE         = 2002, /* IR 占空比 */
 
     /* 2D (NIR) AE 参数 (2010-2029) */
-    VXL615_OPTION_2D_FMEAN_TARGET       = 2010, /* 2D 目标 Fmean */
-    VXL615_OPTION_2D_FMEAN_BOUNDARY     = 2011, /* 2D Fmean 边界 */
-    VXL615_OPTION_2D_FMEAN_CURRENT      = 2012, /* 2D 当前 Fmean (只读) */
-    VXL615_OPTION_2D_GAIN_MIN           = 2013, /* 2D 最小增益 */
-    VXL615_OPTION_2D_GAIN_MAX           = 2014, /* 2D 最大增益 */
-    VXL615_OPTION_2D_GAIN_CURRENT       = 2015, /* 2D 当前增益 (只读) */
-    VXL615_OPTION_2D_EXPOSURE_MIN       = 2016, /* 2D 最小曝光 */
-    VXL615_OPTION_2D_EXPOSURE_MID       = 2017, /* 2D 中间曝光 */
-    VXL615_OPTION_2D_EXPOSURE_MAX       = 2018, /* 2D 最大曝光 */
-    VXL615_OPTION_2D_EXPOSURE_CURRENT   = 2019, /* 2D 当前曝光 (只读) */
+    VXL6X5_OPTION_2D_FMEAN_TARGET       = 2010, /* 2D 目标 Fmean */
+    VXL6X5_OPTION_2D_FMEAN_BOUNDARY     = 2011, /* 2D Fmean 边界 */
+    VXL6X5_OPTION_2D_FMEAN_CURRENT      = 2012, /* 2D 当前 Fmean (只读) */
+    VXL6X5_OPTION_2D_GAIN_MIN           = 2013, /* 2D 最小增益 */
+    VXL6X5_OPTION_2D_GAIN_MAX           = 2014, /* 2D 最大增益 */
+    VXL6X5_OPTION_2D_GAIN_CURRENT       = 2015, /* 2D 当前增益 (只读) */
+    VXL6X5_OPTION_2D_EXPOSURE_MIN       = 2016, /* 2D 最小曝光 */
+    VXL6X5_OPTION_2D_EXPOSURE_MID       = 2017, /* 2D 中间曝光 */
+    VXL6X5_OPTION_2D_EXPOSURE_MAX       = 2018, /* 2D 最大曝光 */
+    VXL6X5_OPTION_2D_EXPOSURE_CURRENT   = 2019, /* 2D 当前曝光 (只读) */
 
     /* 深度后处理参数 (2030-2049) */
-    VXL615_OPTION_NCC_THRESHOLD         = 2030, /* NCC 阈值 [0-255] */
-    VXL615_OPTION_PATCH_SIZE            = 2031, /* Patch 大小 [0-6] */
-    VXL615_OPTION_OUTLIER_REMOVAL       = 2032, /* 异常值移除开关 */
-    VXL615_OPTION_DENOISE_ENABLE        = 2033, /* 降噪开关 */
-    VXL615_OPTION_DENOISE_LEVEL         = 2034, /* 降噪级别 [1-3] */
-    VXL615_OPTION_MEDIAN_FILTER         = 2035, /* 中值滤波开关 */
-    VXL615_OPTION_MEDIAN_KERNEL_SIZE    = 2036, /* 中值滤波核大小 */
-    VXL615_OPTION_UNDISTORTION          = 2037, /* 去畸变开关 */
+    VXL6X5_OPTION_NCC_THRESHOLD         = 2030, /* NCC 阈值 [0-255] */
+    VXL6X5_OPTION_PATCH_SIZE            = 2031, /* Patch 大小 [0-6] */
+    VXL6X5_OPTION_OUTLIER_REMOVAL       = 2032, /* 异常值移除开关 */
+    VXL6X5_OPTION_DENOISE_ENABLE        = 2033, /* 降噪开关 */
+    VXL6X5_OPTION_DENOISE_LEVEL         = 2034, /* 降噪级别 [1-3] */
+    VXL6X5_OPTION_MEDIAN_FILTER         = 2035, /* 中值滤波开关 */
+    VXL6X5_OPTION_MEDIAN_KERNEL_SIZE    = 2036, /* 中值滤波核大小 */
+    VXL6X5_OPTION_UNDISTORTION          = 2037, /* 去畸变开关 */
 
     /* 3D (深度) AE 参数 (2050-2069) */
-    VXL615_OPTION_3D_FMEAN_TARGET       = 2050, /* 3D 目标 Fmean */
-    VXL615_OPTION_3D_FMEAN_BOUNDARY     = 2051, /* 3D Fmean 边界 */
-    VXL615_OPTION_3D_FMEAN_CURRENT      = 2052, /* 3D 当前 Fmean (只读) */
-    VXL615_OPTION_3D_GAIN_MIN           = 2053, /* 3D 最小增益 */
-    VXL615_OPTION_3D_GAIN_MAX           = 2054, /* 3D 最大增益 */
-    VXL615_OPTION_3D_GAIN_CURRENT       = 2055, /* 3D 当前增益 (只读) */
-    VXL615_OPTION_3D_EXPOSURE_MIN       = 2056, /* 3D 最小曝光 */
-    VXL615_OPTION_3D_EXPOSURE_MID       = 2057, /* 3D 中间曝光 */
-    VXL615_OPTION_3D_EXPOSURE_MAX       = 2058, /* 3D 最大曝光 */
-    VXL615_OPTION_3D_EXPOSURE_CURRENT   = 2059, /* 3D 当前曝光 (只读) */
+    VXL6X5_OPTION_3D_FMEAN_TARGET       = 2050, /* 3D 目标 Fmean */
+    VXL6X5_OPTION_3D_FMEAN_BOUNDARY     = 2051, /* 3D Fmean 边界 */
+    VXL6X5_OPTION_3D_FMEAN_CURRENT      = 2052, /* 3D 当前 Fmean (只读) */
+    VXL6X5_OPTION_3D_GAIN_MIN           = 2053, /* 3D 最小增益 */
+    VXL6X5_OPTION_3D_GAIN_MAX           = 2054, /* 3D 最大增益 */
+    VXL6X5_OPTION_3D_GAIN_CURRENT       = 2055, /* 3D 当前增益 (只读) */
+    VXL6X5_OPTION_3D_EXPOSURE_MIN       = 2056, /* 3D 最小曝光 */
+    VXL6X5_OPTION_3D_EXPOSURE_MID       = 2057, /* 3D 中间曝光 */
+    VXL6X5_OPTION_3D_EXPOSURE_MAX       = 2058, /* 3D 最大曝光 */
+    VXL6X5_OPTION_3D_EXPOSURE_CURRENT   = 2059, /* 3D 当前曝光 (只读) */
 
     VXL_OPTION_COUNT
 } vxl_option_t;
@@ -228,7 +228,7 @@ typedef struct vxl_device_info {
     char        serial_number[VXL_MAX_STRING_LEN];
     char        manufacturer[VXL_MAX_STRING_LEN];
     char        fw_version[VXL_MAX_STRING_LEN];     /* 固件版本 */
-    char        rom_version[VXL_MAX_STRING_LEN];    /* ROM 版本（VXL615支持） */
+    char        rom_version[VXL_MAX_STRING_LEN];    /* ROM 版本（VXL6X5支持） */
     uint16_t    vendor_id;
     uint16_t    product_id;
     uint16_t    uvc_version;        /* UVC 版本 (如 0x0100 = 1.0) */

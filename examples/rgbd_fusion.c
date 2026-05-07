@@ -39,14 +39,14 @@
 
 #include "vxl.h"
 #include "vxl_dip.h"
-#include "vxl615_types.h"  /* VXL615 specific options */
+#include "vxl6x5_types.h"  /* VXL6X5 specific options */
 
 /*============================================================================
  * 常量定义
  *============================================================================*/
 
 #define DEFAULT_CAPTURE_TIME_SEC    5       /* 默认采集时长 (秒) */
-#define DEPTH_SCALE                 16.0f   /* VXL615 深度比例因子 */
+#define DEPTH_SCALE                 16.0f   /* VXL6X5 深度比例因子 */
 
 /*============================================================================
  * 全局数据
@@ -411,10 +411,10 @@ int main(int argc, char **argv)
         if (err == VXL_SUCCESS && depth_sensor) {
             printf("Found DEPTH sensor\n");
 
-            /* 尝试设置 DEPTH_ONLY 模式 (VXL615 特有，30fps 纯深度) */
+            /* 尝试设置 DEPTH_ONLY 模式 (VXL6X5 特有，30fps 纯深度) */
             err = vxl_sensor_set_option(depth_sensor,
-                                        (vxl_option_t)VXL_OPTION_VXL615_STREAM_MODE,
-                                        (float)VXL615_STREAM_MODE_DEPTH_ONLY);
+                                        (vxl_option_t)VXL_OPTION_VXL6X5_STREAM_MODE,
+                                        (float)VXL6X5_STREAM_MODE_DEPTH_ONLY);
             if (err == VXL_SUCCESS) {
                 printf("Stream mode set to DEPTH_ONLY (30fps)\n");
             } else {

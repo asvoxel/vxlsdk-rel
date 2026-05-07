@@ -127,20 +127,20 @@ add_executable(rgbd_fusion rgbd_fusion.c)
 target_include_directories(rgbd_fusion PRIVATE ${VXL_INCLUDE_DIR})
 target_link_libraries(rgbd_fusion PRIVATE ${VXL_LIBRARIES})
 
-# vxl615_option_control - VXL615 Option控制基础示例
-add_executable(vxl615_option_control vxl615_option_control.c)
-target_include_directories(vxl615_option_control PRIVATE ${VXL_INCLUDE_DIR})
-target_link_libraries(vxl615_option_control PRIVATE ${VXL_LIBRARIES})
+# vxl6x5_option_control - VXL6X5 Option控制基础示例
+add_executable(vxl6x5_option_control vxl6x5_option_control.c)
+target_include_directories(vxl6x5_option_control PRIVATE ${VXL_INCLUDE_DIR})
+target_link_libraries(vxl6x5_option_control PRIVATE ${VXL_LIBRARIES})
 
-# vxl615_depth_tuning - VXL615 深度后处理参数调节示例
-add_executable(vxl615_depth_tuning vxl615_depth_tuning.c)
-target_include_directories(vxl615_depth_tuning PRIVATE ${VXL_INCLUDE_DIR})
-target_link_libraries(vxl615_depth_tuning PRIVATE ${VXL_LIBRARIES})
+# vxl6x5_depth_tuning - VXL6X5 深度后处理参数调节示例
+add_executable(vxl6x5_depth_tuning vxl6x5_depth_tuning.c)
+target_include_directories(vxl6x5_depth_tuning PRIVATE ${VXL_INCLUDE_DIR})
+target_link_libraries(vxl6x5_depth_tuning PRIVATE ${VXL_LIBRARIES})
 
-# vxl615_ae_adjustment - VXL615 AE参数动态调整示例
-add_executable(vxl615_ae_adjustment vxl615_ae_adjustment.c)
-target_include_directories(vxl615_ae_adjustment PRIVATE ${VXL_INCLUDE_DIR})
-target_link_libraries(vxl615_ae_adjustment PRIVATE ${VXL_LIBRARIES})
+# vxl6x5_ae_adjustment - VXL6X5 AE参数动态调整示例
+add_executable(vxl6x5_ae_adjustment vxl6x5_ae_adjustment.c)
+target_include_directories(vxl6x5_ae_adjustment PRIVATE ${VXL_INCLUDE_DIR})
+target_link_libraries(vxl6x5_ae_adjustment PRIVATE ${VXL_LIBRARIES})
 
 #=============================================================================
 # macOS 签名 (获取 USB 权限)
@@ -148,7 +148,7 @@ target_link_libraries(vxl615_ae_adjustment PRIVATE ${VXL_LIBRARIES})
 
 if(APPLE AND EXISTS "${CMAKE_SOURCE_DIR}/entitlements.plist")
     foreach(target device_info low_level_api hotplug_test rgbd_fusion
-                   vxl615_option_control vxl615_depth_tuning vxl615_ae_adjustment)
+                   vxl6x5_option_control vxl6x5_depth_tuning vxl6x5_ae_adjustment)
         add_custom_command(TARGET ${target} POST_BUILD
             COMMAND codesign --force --sign -
                     --entitlements ${CMAKE_SOURCE_DIR}/entitlements.plist
@@ -169,6 +169,6 @@ message(STATUS "VXL library: ${VXL_LIBRARY}")
 message(STATUS "libusb: ${LIBUSB_LIBRARY}")
 message(STATUS "libjpeg: ${JPEG_LIBRARY}")
 message(STATUS "Basic Examples: device_info, low_level_api, hotplug_test, rgbd_fusion")
-message(STATUS "VXL615 Examples: vxl615_option_control, vxl615_depth_tuning, vxl615_ae_adjustment")
+message(STATUS "VXL6X5 Examples: vxl6x5_option_control, vxl6x5_depth_tuning, vxl6x5_ae_adjustment")
 message(STATUS "==================================")
 message(STATUS "")

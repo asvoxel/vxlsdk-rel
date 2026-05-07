@@ -1,6 +1,6 @@
 /**
- * @file vxl615_depth_tuning.c
- * @brief VXL615 深度后处理参数调节示例
+ * @file vxl6x5_depth_tuning.c
+ * @brief VXL6X5 深度后处理参数调节示例
  *
  * 演示如何调节深度后处理参数以优化深度图质量：
  * 1. NCC阈值调节 (匹配质量控制)
@@ -10,8 +10,8 @@
  * 5. 中值滤波
  * 6. 去畸变
  *
- * 编译: make vxl615_depth_tuning
- * 运行: ./bin/vxl615_depth_tuning
+ * 编译: make vxl6x5_depth_tuning
+ * 运行: ./bin/vxl6x5_depth_tuning
  */
 
 #include <stdio.h>
@@ -21,7 +21,7 @@
 #include "vxl_device.h"
 #include "vxl_sensor.h"
 #include "vxl_types.h"
-#include "vxl615_types.h"
+#include "vxl6x5_types.h"
 
 /* 深度后处理参数配置 */
 typedef struct {
@@ -84,7 +84,7 @@ static const depth_processing_config_t PRESET_FAST = {
  * 辅助函数
  *============================================================================*/
 
-static vxl_sensor_t* open_vxl615_sensor(vxl_context_t **out_ctx, vxl_device_t **out_device)
+static vxl_sensor_t* open_vxl6x5_sensor(vxl_context_t **out_ctx, vxl_device_t **out_device)
 {
     vxl_context_t *ctx = NULL;
     vxl_device_t *device = NULL;
@@ -104,7 +104,7 @@ static vxl_sensor_t* open_vxl615_sensor(vxl_context_t **out_ctx, vxl_device_t **
         return NULL;
     }
 
-    /* 查找VXL615 */
+    /* 查找VXL6X5 */
     for (size_t i = 0; i < count; i++) {
         err = vxl_context_get_device(ctx, i, &device);
         if (err != VXL_SUCCESS) continue;
@@ -112,8 +112,7 @@ static vxl_sensor_t* open_vxl615_sensor(vxl_context_t **out_ctx, vxl_device_t **
         vxl_device_info_t info;
         err = vxl_device_get_info(device, &info);
         if (err == VXL_SUCCESS &&
-            info.vendor_id == VXL615_VENDOR_ID &&
-            info.product_id == VXL615_PRODUCT_ID) {
+            VXL6X5_VID_PID_MATCH(info.vendor_id, info.product_id)) {
 
             err = vxl_device_open(device);
             if (err != VXL_SUCCESS) continue;
@@ -128,7 +127,7 @@ static vxl_sensor_t* open_vxl615_sensor(vxl_context_t **out_ctx, vxl_device_t **
             if (err == VXL_SUCCESS) {
                 *out_ctx = ctx;
                 *out_device = device;
-                printf("Opened VXL615: %s\n", info.name);
+                printf("Opened VXL6X5: %s\n", info.name);
                 return sensor;
             }
 
@@ -152,7 +151,7 @@ vxl_error_t apply_depth_processing_config(vxl_sensor_t *sensor,
     printf("Applying depth processing configuration...\n");
 
     /* NCC Threshold */
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_NCC_THRESHOLD, config->ncc_threshold);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_NCC_THRESHOLD, config->ncc_threshold);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set NCC threshold\n");
         return err;
@@ -160,7 +159,7 @@ vxl_error_t apply_depth_processing_config(vxl_sensor_t *sensor,
     printf("  NCC threshold: %.0f\n", config->ncc_threshold);
 
     /* Patch Size */
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_PATCH_SIZE, config->patch_size);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_PATCH_SIZE, config->patch_size);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set patch size\n");
         return err;
@@ -168,7 +167,7 @@ vxl_error_t apply_depth_processing_config(vxl_sensor_t *sensor,
     printf("  Patch size: %.0f\n", config->patch_size);
 
     /* Outlier Removal */
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_OUTLIER_REMOVAL, config->outlier_removal);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_OUTLIER_REMOVAL, config->outlier_removal);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set outlier removal\n");
         return err;
@@ -176,7 +175,7 @@ vxl_error_t apply_depth_processing_config(vxl_sensor_t *sensor,
     printf("  Outlier removal: %s\n", config->outlier_removal > 0.5f ? "ON" : "OFF");
 
     /* Denoise */
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_DENOISE_ENABLE, config->denoise_enable);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_DENOISE_ENABLE, config->denoise_enable);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set denoise enable\n");
         return err;
@@ -184,7 +183,7 @@ vxl_error_t apply_depth_processing_config(vxl_sensor_t *sensor,
     printf("  Denoise: %s\n", config->denoise_enable > 0.5f ? "ON" : "OFF");
 
     if (config->denoise_enable > 0.5f) {
-        err = vxl_sensor_set_option(sensor, VXL615_OPTION_DENOISE_LEVEL, config->denoise_level);
+        err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_DENOISE_LEVEL, config->denoise_level);
         if (err != VXL_SUCCESS) {
             fprintf(stderr, "  Failed to set denoise level\n");
             return err;
@@ -193,7 +192,7 @@ vxl_error_t apply_depth_processing_config(vxl_sensor_t *sensor,
     }
 
     /* Median Filter */
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_MEDIAN_FILTER, config->median_filter);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_MEDIAN_FILTER, config->median_filter);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set median filter\n");
         return err;
@@ -201,7 +200,7 @@ vxl_error_t apply_depth_processing_config(vxl_sensor_t *sensor,
     printf("  Median filter: %s\n", config->median_filter > 0.5f ? "ON" : "OFF");
 
     if (config->median_filter > 0.5f) {
-        err = vxl_sensor_set_option(sensor, VXL615_OPTION_MEDIAN_KERNEL_SIZE, config->median_kernel_size);
+        err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_MEDIAN_KERNEL_SIZE, config->median_kernel_size);
         if (err != VXL_SUCCESS) {
             fprintf(stderr, "  Failed to set median kernel size\n");
             return err;
@@ -210,7 +209,7 @@ vxl_error_t apply_depth_processing_config(vxl_sensor_t *sensor,
     }
 
     /* Undistortion */
-    err = vxl_sensor_set_option(sensor, VXL615_OPTION_UNDISTORTION, config->undistortion);
+    err = vxl_sensor_set_option(sensor, VXL6X5_OPTION_UNDISTORTION, config->undistortion);
     if (err != VXL_SUCCESS) {
         fprintf(stderr, "  Failed to set undistortion\n");
         return err;
@@ -227,34 +226,34 @@ void print_current_config(vxl_sensor_t *sensor)
 
     printf("\nCurrent Depth Processing Configuration:\n");
 
-    vxl_sensor_get_option(sensor, VXL615_OPTION_NCC_THRESHOLD, &value);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_NCC_THRESHOLD, &value);
     printf("  NCC threshold: %.0f\n", value);
 
-    vxl_sensor_get_option(sensor, VXL615_OPTION_PATCH_SIZE, &value);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_PATCH_SIZE, &value);
     printf("  Patch size: %.0f\n", value);
 
-    vxl_sensor_get_option(sensor, VXL615_OPTION_OUTLIER_REMOVAL, &value);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_OUTLIER_REMOVAL, &value);
     printf("  Outlier removal: %s\n", value > 0.5f ? "ON" : "OFF");
 
-    vxl_sensor_get_option(sensor, VXL615_OPTION_DENOISE_ENABLE, &value);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_DENOISE_ENABLE, &value);
     printf("  Denoise: %s", value > 0.5f ? "ON" : "OFF");
     if (value > 0.5f) {
-        vxl_sensor_get_option(sensor, VXL615_OPTION_DENOISE_LEVEL, &value);
+        vxl_sensor_get_option(sensor, VXL6X5_OPTION_DENOISE_LEVEL, &value);
         printf(" (level=%.0f)\n", value);
     } else {
         printf("\n");
     }
 
-    vxl_sensor_get_option(sensor, VXL615_OPTION_MEDIAN_FILTER, &value);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_MEDIAN_FILTER, &value);
     printf("  Median filter: %s", value > 0.5f ? "ON" : "OFF");
     if (value > 0.5f) {
-        vxl_sensor_get_option(sensor, VXL615_OPTION_MEDIAN_KERNEL_SIZE, &value);
+        vxl_sensor_get_option(sensor, VXL6X5_OPTION_MEDIAN_KERNEL_SIZE, &value);
         printf(" (kernel=%.0f)\n", value);
     } else {
         printf("\n");
     }
 
-    vxl_sensor_get_option(sensor, VXL615_OPTION_UNDISTORTION, &value);
+    vxl_sensor_get_option(sensor, VXL6X5_OPTION_UNDISTORTION, &value);
     printf("  Undistortion: %s\n", value > 0.5f ? "ON" : "OFF");
 }
 
@@ -288,8 +287,8 @@ void example_manual_tuning(vxl_sensor_t *sensor)
     /* 室内低纹理场景 - 降低NCC阈值增加覆盖 */
     printf("\n1. Indoor low-texture (indoor, plain walls):\n");
     printf("   -> Lower NCC threshold for more coverage\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_NCC_THRESHOLD, 80.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_PATCH_SIZE, 4.0f);  /* 较大窗口补偿 */
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_NCC_THRESHOLD, 80.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_PATCH_SIZE, 4.0f);  /* 较大窗口补偿 */
     print_current_config(sensor);
 
     sleep(2);
@@ -297,8 +296,8 @@ void example_manual_tuning(vxl_sensor_t *sensor)
     /* 室外高纹理场景 - 提高NCC阈值保证质量 */
     printf("\n2. Outdoor high-texture (outdoor, rich details):\n");
     printf("   -> Higher NCC threshold for better quality\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_NCC_THRESHOLD, 180.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_PATCH_SIZE, 3.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_NCC_THRESHOLD, 180.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_PATCH_SIZE, 3.0f);
     print_current_config(sensor);
 
     sleep(2);
@@ -306,8 +305,8 @@ void example_manual_tuning(vxl_sensor_t *sensor)
     /* 动态场景 - 减少后处理加快速度 */
     printf("\n3. Dynamic scene (fast moving objects):\n");
     printf("   -> Disable heavy processing for speed\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_DENOISE_ENABLE, 0.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_MEDIAN_FILTER, 0.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_DENOISE_ENABLE, 0.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_MEDIAN_FILTER, 0.0f);
     print_current_config(sensor);
 }
 
@@ -316,30 +315,30 @@ void example_noise_reduction(vxl_sensor_t *sensor)
     printf("\n=== Example: Noise Reduction Tuning ===\n");
 
     printf("\n1. No noise reduction:\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_DENOISE_ENABLE, 0.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_MEDIAN_FILTER, 0.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_DENOISE_ENABLE, 0.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_MEDIAN_FILTER, 0.0f);
     print_current_config(sensor);
 
     sleep(2);
 
     printf("\n2. Light noise reduction (denoise level 1):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_DENOISE_ENABLE, 1.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_DENOISE_LEVEL, 1.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_DENOISE_ENABLE, 1.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_DENOISE_LEVEL, 1.0f);
     print_current_config(sensor);
 
     sleep(2);
 
     printf("\n3. Medium noise reduction (denoise level 2 + median 3x3):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_DENOISE_LEVEL, 2.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_MEDIAN_FILTER, 1.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_MEDIAN_KERNEL_SIZE, 3.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_DENOISE_LEVEL, 2.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_MEDIAN_FILTER, 1.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_MEDIAN_KERNEL_SIZE, 3.0f);
     print_current_config(sensor);
 
     sleep(2);
 
     printf("\n4. Strong noise reduction (denoise level 3 + median 5x5):\n");
-    vxl_sensor_set_option(sensor, VXL615_OPTION_DENOISE_LEVEL, 3.0f);
-    vxl_sensor_set_option(sensor, VXL615_OPTION_MEDIAN_KERNEL_SIZE, 5.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_DENOISE_LEVEL, 3.0f);
+    vxl_sensor_set_option(sensor, VXL6X5_OPTION_MEDIAN_KERNEL_SIZE, 5.0f);
     print_current_config(sensor);
 }
 
@@ -349,16 +348,16 @@ void example_noise_reduction(vxl_sensor_t *sensor)
 
 int main(int argc, char **argv)
 {
-    printf("VXL615 Depth Processing Tuning Example\n");
+    printf("VXL6X5 Depth Processing Tuning Example\n");
     printf("=======================================\n\n");
 
-    /* 打开VXL615设备 */
+    /* 打开VXL6X5设备 */
     vxl_context_t *ctx = NULL;
     vxl_device_t *device = NULL;
-    vxl_sensor_t *sensor = open_vxl615_sensor(&ctx, &device);
+    vxl_sensor_t *sensor = open_vxl6x5_sensor(&ctx, &device);
 
     if (!sensor) {
-        fprintf(stderr, "Failed to open VXL615 sensor\n");
+        fprintf(stderr, "Failed to open VXL6X5 sensor\n");
         return EXIT_FAILURE;
     }
 

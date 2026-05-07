@@ -362,7 +362,7 @@ static void test_all_streams(vxl_device_t *dev)
 
         /* 获取 Profile
          * 所有传感器使用 profile[0]，这是默认推荐分辨率
-         * (VXL615 已在 backend 中重排为 640x400@30fps 优先)
+         * (VXL6X5 已在 backend 中重排为 640x400@30fps 优先)
          */
         int profile_idx = 0;
         err = vxl_sensor_get_profile(sensors[i], profile_idx, &profiles[i]);

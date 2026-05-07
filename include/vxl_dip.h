@@ -347,7 +347,7 @@ vxl_error_t vxl_dip_align_depth_to_rgb(const vxl_frame_t *depth,
 typedef struct vxl_rgbd_config {
     vxl_intrinsics_t    depth_intrin;   /**< 深度相机内参 */
     vxl_intrinsics_t    rgb_intrin;     /**< RGB 相机内参 */
-    float               depth_scale;    /**< 深度比例因子 (raw/scale=mm, VXL615=8) */
+    float               depth_scale;    /**< 深度比例因子 (raw/scale=mm, VXL6X5=8) */
 } vxl_rgbd_config_t;
 
 /**
@@ -380,14 +380,14 @@ vxl_error_t vxl_dip_resize_depth(const vxl_frame_t *src,
  * @param aligned   输出对齐后的深度帧 (Z16 格式，与 RGB 分辨率相同)
  * @return 错误码
  *
- * @note 对于 VXL615：depth_scale = 8.0f
+ * @note 对于 VXL6X5：depth_scale = 8.0f
  *       对于 VXL605：depth_scale = 16.0f
  *
  * @example
  *   vxl_rgbd_config_t config = {
  *       .depth_intrin = {...},  // 从设备获取
  *       .rgb_intrin = {...},    // 从设备获取
- *       .depth_scale = 8.0f     // VXL615
+ *       .depth_scale = 8.0f     // VXL6X5
  *   };
  *   vxl_frame_t *aligned = NULL;
  *   if (vxl_dip_rgbd_align(depth, rgb, &config, &aligned) == VXL_SUCCESS) {
